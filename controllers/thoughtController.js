@@ -1,6 +1,6 @@
 
 
-const { Thoughts } = require('../models');
+const { Thoughts, Users } = require('../models');
 
 
 
@@ -13,10 +13,36 @@ module.exports = {
             .catch(err => res.status(500).json(err))
     },
 
+    // Get single thought
+    getSingleThought(req, res) {
+        Thoughts.findOne({ _id: req.params.thoughtId })
+            .select()
+            .lean()
+            .then(thought =>
+                !thought
+                    ? res.status(404).json({ message: 'Thought not found!' })
+                    : res.status(200).json(thought)
+            )
+            .catch(err => console.log(err))
+    },
+
     // Create a new thought
     createThought(req, res) {
         Thoughts.create(req.body)
-            .then(thought => res.status(200).json(thought))
+            .then((thought) => {
+                return Users.findOneAndUpdate(
+                    { _id: req.body.userId },
+                    { $addToSet: { thoughts: thought._id } },
+                    { new: true }
+                );
+            })
+            .then((user) =>
+                !user
+                    ? res.status(404).json({
+                        message: 'Thought created, user not found'
+                    })
+                    : res.status(200).json('Thought created!')
+            )
             .catch(err => res.status(500).json(err));
     },
 
