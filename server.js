@@ -10,7 +10,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // GET route for all users
-app.get()
+app.get('/allUsers', (req, res) => {
+    Users.find({}, (err, result) => {
+        if 
+    })
+
+})
 
 // GET route for all thoughts
 
