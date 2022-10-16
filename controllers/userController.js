@@ -1,5 +1,5 @@
 
-const { Users } = require('../models');
+const { Users, Thoughts } = require('../models');
 
 
 
@@ -15,7 +15,7 @@ module.exports = {
     createUser(req, res) {
         Users.create(req.body)
             .then(user => res.status(200).json(user))
-            .then(err => res.status(500).json(err));
+            .catch(err => res.status(500).json(err));
     },
     // PUT route for updating users
 
@@ -33,12 +33,12 @@ module.exports = {
     },
     // DELETE route for deleting users
     deleteUser(req, res) {
-        Users.findOneAndDelete({ _id: req.body.userId })
+        Users.findOneAndDelete({ _id: req.params.userId })
             .then(
                 (user) =>
                     !user
                         ? res.status(404).json({ message: 'No user with that ID' })
-                        : Application.deleteMany({ _id: { $in: user.applications } })
+                        : Thoughts.deleteMany({ _id: { $in: user.thoughts } })
             )
             .then(() => res.json({ message: 'User deleted!' }))
             .catch((err) => res.status(500).json(err));

@@ -1,21 +1,53 @@
 
-// GET route for all thoughts
-app.get('/thoughts', (req, res) => {
-    Thoughts.find({}, (err, result) => {
-        if (result) {
-            res.status(200).json(result);
-        } else {
-            console.log('Error!');
-            res.status(500).json({ message: 'There was an error!' });
-        };
-    });
 
-})
+const { Thoughts } = require('../models');
 
 
 
-// POST route for creating thoughts
+module.exports = {
 
-// PUT route for updating thoughts
+    // Find all thoughts
+    getThoughts(req, res) {
+        Thoughts.find()
+            .then((thoughts) => res.status(200).json(thoughts))
+            .catch(err => res.status(500).json(err))
+    },
 
-// DELETE route for deleting thoughts
+    // Create a new thought
+    createThought(req, res) {
+        Thoughts.create(req.body)
+            .then(thought => res.status(200).json(thought))
+            .catch(err => res.status(500).json(err));
+    },
+
+    // PUT route for updating thoughts
+    updateThought(req, res) {
+        Thoughts.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $set: req.body },
+            { runValidators: true, new: true }
+        ).then(
+            (thought) =>
+                !thought
+                    ? res.status(404).json({ message: 'Error in updating!' })
+                    : res.json(thought)
+        )
+    },
+
+    // DELETE route for deleting thoughts
+    deleteThought(req, res) {
+        Thoughts.findOneAndDelete({ _id: req.params.thoughtId })
+            // .then(
+            //     (thought) =>
+            //         !thought
+            //             ? res.status(404).json({ message: 'No thought with that ID' })
+            //             : Thoughts.deleteMany({ _id: { $in: thought.thoughts } })
+            // )
+            .then(() => res.json({ message: 'Thought deleted!' }))
+            .catch((err) => res.status(500).json(err));
+    }
+}
+
+
+
+
