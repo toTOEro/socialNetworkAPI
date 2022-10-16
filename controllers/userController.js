@@ -11,6 +11,19 @@ module.exports = {
             .then((users) => res.status(200).json(users))
             .catch(err => res.status(500).json(err))
     },
+
+    // Get single user
+    getSingleUser(req, res) {
+        Users.findOne({ _id: req.params.userId })
+            .select()
+            .lean()
+            .then(user =>
+                !user
+                    ? res.status(404).json({ message: 'user not found!' })
+                    : res.status(200).json(user))
+            .catch(err => res.status(500).json(err))
+    },
+
     // Create a new user
     createUser(req, res) {
         Users.create(req.body)
